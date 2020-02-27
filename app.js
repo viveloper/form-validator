@@ -107,7 +107,7 @@ class App extends React.Component {
       this.setState({
         [input.key]: {
           ...input,
-          errorMsg: `${input.key} must be at least ${max} characters`
+          errorMsg: `${input.key} must be less than ${max} characters`
         }
       });
     } else {
