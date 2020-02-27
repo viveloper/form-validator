@@ -1,223 +1,237 @@
 'use strict';
 
-const e = React.createElement;
-
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+const App = () => {
+  const [state, setState] = React.useState({
+    inputs: {
       username: {
         key: 'username',
         value: '',
-        errorMsg: ''
+        error: ''
       },
       email: {
         key: 'email',
         value: '',
-        errorMsg: ''
+        error: ''
       },
       password: {
         key: 'password',
         value: '',
-        errorMsg: ''
+        error: ''
       },
       confirmPassword: {
         key: 'confirmPassword',
         value: '',
-        errorMsg: ''
-      },
-      focus: {
-        id: 'username',
-        position: 0
+        error: ''
       }
-    };
-  }
+    }
+  });
 
-  handleInputChange(e) {
-    const key = e.target.id;
-    this.setState(
-      {
-        [key]: {
-          ...this.state[key],
-          value: e.target.value
-        }
-      },
-      () => {
-        this.validateInput(this.state[key]);
-      }
-    );
-  }
-
-  validateInput(input) {
-    this.checkRequire(input);
-    if (input.key === 'username') this.checkLength(input, 3, 15);
-    if (input.key === 'password') this.checkLength(input, 6, 25);
-    if (input.key === 'email') this.checkEmail(input);
-    if (input.key === 'confirmPassword')
-      this.checkPasswordMatch(this.state.password, input);
-  }
-
-  handleSubmit(e) {
+  const handleSubmit = e => {
     e.preventDefault();
+  };
 
-    if (
-      this.state.username.errorMsg === 'success' &&
-      this.state.email.errorMsg === 'success' &&
-      this.state.password.errorMsg === 'success' &&
-      this.state.confirmPassword.errorMsg === 'success'
-    ) {
-      console.log('submit', {
-        username: this.state.username.value,
-        email: this.state.email.value,
-        password: this.state.password.value,
-        confirmPassword: this.state.confirmPassword.value
-      });
-    } else {
-      console.log('input is not valid');
-    }
-  }
+  const handleInputChange = e => {
+    checkRequire(e.target.id, e.target.value);
+    if (e.target.id === 'username')
+      checkLength(e.target.id, e.target.value, 4, 15);
+    if (e.target.id === 'password')
+      checkLength(e.target.id, e.target.value, 6, 25);
+    if (e.target.id === 'email') checkEmail(e.target.id, e.target.value);
+    if (e.target.id === 'confirmPassword')
+      checkPasswordMatch(e.target.id, e.target.value);
+  };
 
-  checkRequire(input) {
-    if (input.value.trim().length === 0) {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `${input.key} is required`
-        }
-      });
-    } else {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `success`
-        }
-      });
-    }
-  }
-
-  checkLength(input, min, max) {
-    if (input.value.trim().length < min) {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `${input.key} must be at least ${min} characters`
-        }
-      });
-    } else if (input.value.trim().length > max) {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `${input.key} must be at least ${max} characters`
+  const checkRequire = (inputKey, inputValue) => {
+    if (inputValue.trim().length !== 0) {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: 'success'
+          }
         }
       });
     } else {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `success`
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: `${inputKey} is required`
+          }
         }
       });
     }
-  }
+  };
 
-  checkEmail(input) {
+  const checkLength = (inputKey, inputValue, min, max) => {
+    if (inputValue.trim().length < min) {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: `${inputKey} must be at least ${min} characters`
+          }
+        }
+      });
+    } else if (inputValue.trim().length > max) {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: `${inputKey} must be less than ${max} characters`
+          }
+        }
+      });
+    } else {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: 'success'
+          }
+        }
+      });
+    }
+  };
+
+  const checkEmail = (inputKey, inputValue) => {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if (re.test(String(input.value.trim()).toLowerCase())) {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `success`
+
+    if (re.test(String(inputValue.trim()).toLowerCase())) {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: 'success'
+          }
         }
       });
     } else {
-      this.setState({
-        [input.key]: {
-          ...input,
-          errorMsg: `Email is not valid`
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: 'Email is not valid'
+          }
         }
       });
     }
-  }
+  };
 
-  checkPasswordMatch(input1, input2) {
-    if (input1.value !== input2.value) {
-      this.setState({
-        [input2.key]: {
-          ...input2,
-          errorMsg: `Password do not match`
+  const checkPasswordMatch = (inputKey, inputValue) => {
+    if (state.inputs['password'].value !== inputValue) {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: 'Password do not match'
+          }
+        }
+      });
+    } else {
+      setState({
+        ...state,
+        inputs: {
+          ...state.inputs,
+          [inputKey]: {
+            ...state.inputs[inputKey],
+            value: inputValue,
+            error: 'success'
+          }
         }
       });
     }
-  }
+  };
 
-  getClassName(input) {
+  const getClassName = input => {
     let className = '';
-    if (input.errorMsg === '') {
+    if (input.error === '') {
       className = 'form-control';
-    } else if (input.errorMsg === 'success') {
+    } else if (input.error === 'success') {
       className = 'form-control success';
     } else {
       className = 'form-control error';
     }
     return className;
-  }
+  };
 
-  render() {
-    const { username, email, password, confirmPassword } = this.state;
-    return (
-      <form className="form" id="form" onSubmit={this.handleSubmit.bind(this)}>
-        <h2 className="form-title">Register With Us</h2>
-        <div className={this.getClassName(username)}>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            placeholder="Enter username"
-            value={username.value}
-            onChange={this.handleInputChange.bind(this)}
-          />
-          <small>{username.errorMsg}</small>
-        </div>
-        <div className={this.getClassName(email)}>
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            id="email"
-            placeholder="Enter email"
-            value={email.value}
-            onChange={this.handleInputChange.bind(this)}
-          />
-          <small>{email.errorMsg}</small>
-        </div>
-        <div className={this.getClassName(password)}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter password"
-            value={password.value}
-            onChange={this.handleInputChange.bind(this)}
-          />
-          <small>{password.errorMsg}</small>
-        </div>
-        <div className={this.getClassName(confirmPassword)}>
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            placeholder="Enter password again"
-            value={confirmPassword.value}
-            onChange={this.handleInputChange.bind(this)}
-          />
-          <small>{confirmPassword.errorMsg}</small>
-        </div>
-        <button type="submit" className="btn-submit">
-          Submit
-        </button>
-      </form>
-    );
-  }
-}
+  return (
+    <form className="form" id="form" onSubmit={handleSubmit}>
+      <h2 className="form-title">Register With Us</h2>
+      <div className={getClassName(state.inputs.username)}>
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          placeholder="Enter username"
+          value={state.inputs.username.value}
+          onChange={handleInputChange}
+        />
+        <small>{state.inputs.username.error}</small>
+      </div>
+      <div className={getClassName(state.inputs.email)}>
+        <label htmlFor="email">Email</label>
+        <input
+          type="text"
+          id="email"
+          placeholder="Enter email"
+          value={state.inputs.email.value}
+          onChange={handleInputChange}
+        />
+        <small>{state.inputs.email.error}</small>
+      </div>
+      <div className={getClassName(state.inputs.password)}>
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter password"
+          value={state.inputs.password.value}
+          onChange={handleInputChange}
+        />
+        <small>{state.inputs.password.error}</small>
+      </div>
+      <div className={getClassName(state.inputs.confirmPassword)}>
+        <label htmlFor="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Enter password again"
+          value={state.inputs.confirmPassword.value}
+          onChange={handleInputChange}
+        />
+        <small>{state.inputs.confirmPassword.error}</small>
+      </div>
+      <button type="submit" className="btn-submit">
+        Submit
+      </button>
+    </form>
+  );
+};
 
 const domContainer = document.querySelector('#app');
-ReactDOM.render(e(App), domContainer);
+ReactDOM.render(React.createElement(App), domContainer);
