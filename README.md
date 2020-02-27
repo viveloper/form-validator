@@ -1,3 +1,3 @@
 # Form Validator
 
-## using Template
+## using React
